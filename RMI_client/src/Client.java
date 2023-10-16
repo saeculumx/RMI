@@ -1,10 +1,12 @@
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.RemoteObject;
 import java.util.ArrayList;
 
-public class Server extends RemoteObject implements RemoteInterface {
-    public Server() throws RemoteException{
-        super();
+public class Client implements RemoteInterface{
+    public Client() throws RemoteException, MalformedURLException, NotBoundException {
+        Naming.lookup("rmi://localhost:1099");
     }
     @Override
     public String print(String filename, String printer) {
@@ -23,7 +25,7 @@ public class Server extends RemoteObject implements RemoteInterface {
 
     @Override
     public void start() {
-        System.out.println(">>Server<< Connection Established");
+        System.out.println("Client");
     }
 
     @Override
