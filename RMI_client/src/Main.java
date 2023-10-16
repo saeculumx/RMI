@@ -5,7 +5,7 @@ public class Main {
             System.out.println("Connecting");
             Client client = new Client();
             System.out.println("Connected");
-
+            client.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class Client implements RemoteInterface{
     private RemoteInterface server;
     public Client() throws RemoteException, MalformedURLException, NotBoundException {
-        server = (RemoteInterface) Naming.lookup("rmi://localhost:1099/");
+        RemoteInterface server = (RemoteInterface) Naming.lookup("rmi://localhost:1099/RMIServer");
+        server.start();
     }
     @Override
     public String print(String filename, String printer) {
@@ -28,7 +29,6 @@ public class Client implements RemoteInterface{
 
     @Override
     public void start() {
-        System.out.println("Client");
     }
 
     @Override
