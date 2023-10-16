@@ -2,11 +2,14 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
 public class Client implements RemoteInterface{
+    private RemoteInterface server;
     public Client() throws RemoteException, MalformedURLException, NotBoundException {
-        Naming.lookup("rmi://localhost:1099/start");
+        server = (RemoteInterface) Naming.lookup("rmi://localhost:1099/");
     }
     @Override
     public String print(String filename, String printer) {

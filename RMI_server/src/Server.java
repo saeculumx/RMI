@@ -1,8 +1,9 @@
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class Server extends RemoteObject implements RemoteInterface {
+public class Server extends UnicastRemoteObject implements RemoteInterface {
     public Server() throws RemoteException{
         super();
     }
