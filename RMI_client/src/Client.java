@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Client implements RemoteInterface{
     public Client() throws RemoteException, MalformedURLException, NotBoundException {
-        Naming.lookup("rmi://localhost:1099");
+        Naming.lookup("rmi://localhost:1099/start");
     }
     @Override
     public String print(String filename, String printer) {
