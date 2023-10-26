@@ -1,64 +1,23 @@
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Client implements RemoteInterface{
-    private RemoteInterface server;
-    public Client(String user, String password) throws RemoteException, MalformedURLException, NotBoundException {
+public class Client{
+    //DOES THE CLIENT HAVE TO IMPLEMENTS REMOTE INTERFACE??? I DON'T THINK SO...
+    public Client(String user, String password) throws RemoteException, MalformedURLException, NotBoundException, SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
         RemoteInterface server = (RemoteInterface) Naming.lookup("rmi://localhost:1099/RMIServer");
         server.start();
         TokenObj obj = server.auth(user, password);
-        System.out.println(">>Client<< "+obj.id+" // "+obj.uuid);
+        if (obj != null){
+            System.out.println(">>Client<< "+obj.id+" // "+obj.uuid);
+        }
+        //Test printing with authentication
+        server.print("mammamia I managed to print!", "genericPrinter", obj);
     }
-    @Override
-    public String print(String filename, String printer, String token) {
-        return null;
-    }
-
-    @Override
-    public ArrayList<String> queue(String printer, String token) {
-        return null;
-    }
-
-    @Override
-    public Void topQueue(String printer, int job, String token) {
-        return null;
-    }
-
-    @Override
-    public void start() {
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public void restart(String token) {
-
-    }
-
-    @Override
-    public String status(String printer, String token) {
-        return null;
-    }
-
-    @Override
-    public String readConfig(String parameter, String token) {
-        return null;
-    }
-
-    @Override
-    public void setConfig(String parameter, String value, String token) {
-
-    }
-
-    @Override
-    public TokenObj auth(String user, String password) throws RemoteException {
-        return null;
-    }
-
 }

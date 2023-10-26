@@ -5,11 +5,10 @@ public class Main {
     public static void main(String[] args) {
         try {
             String user = "test";
-            String password = "password";
+            String password = "mammamia";
             System.out.println("Connecting");
             Client client = new Client(user,password);
             System.out.println("Connected");
-            client.start();
             //
             Scanner scanner = new Scanner(System.in);
             try {
