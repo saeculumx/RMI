@@ -6,14 +6,14 @@ public class Main {
         try {
             String user = "user";
             String password = "password";
-            System.out.println("Connecting");
+            System.out.println(">>Client<< Connecting to server");
+            System.out.println(">>Client<< Server Connected");
             Client client = new Client(user,password);
-            System.out.println("Connected");
             //
             Scanner scanner = new Scanner(System.in);
             try {
                 while (true) {
-                    System.out.println("Please input a line");
+                    System.out.println("Please input a line to disconnect");
                     long then = System.currentTimeMillis();
                     String line = scanner.nextLine();
                     long now = System.currentTimeMillis();

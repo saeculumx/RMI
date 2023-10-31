@@ -17,6 +17,9 @@ public class Client{
         if (obj != null){
             System.out.println(">>Client<< "+obj.id+" // "+obj.uuid);
         }
+        else {
+            System.out.println(">>Client<< Wrong password or username");
+        }
         //Test printing with authentication
         server.print(">>Client Requesting<< I managed to print!", "genericPrinter", obj);
     }
