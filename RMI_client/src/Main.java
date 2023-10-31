@@ -4,8 +4,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         try {
-            String user = "test";
-            String password = "mammamia";
+            String user = "user";
+            String password = "password";
             System.out.println("Connecting");
             Client client = new Client(user,password);
             System.out.println("Connected");

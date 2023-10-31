@@ -9,7 +9,7 @@ public class Main {
             Registry registry = LocateRegistry.createRegistry(1099);
             System.out.println("RMI Server is running.");
             Server server = new Server();
-            //String user = "test", email = "test@test.test", password = "mammamia";
+            String user = "user", email = "test@test.test", password = "password";
             //server.addUser(user, email, password);
             registry.rebind("RMIServer", server);
         } catch (Exception e) {

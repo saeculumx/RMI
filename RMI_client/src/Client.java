@@ -18,6 +18,6 @@ public class Client{
             System.out.println(">>Client<< "+obj.id+" // "+obj.uuid);
         }
         //Test printing with authentication
-        server.print("mammamia I managed to print!", "genericPrinter", obj);
+        server.print(">>Client Requesting<< I managed to print!", "genericPrinter", obj);
     }
 }

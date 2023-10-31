@@ -23,17 +23,20 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
     public String print(String filename, String printer, TokenObj token) {
         if (checkToken(token))
             System.out.println(filename);
-        return null;
+        return filename;
     }
 
     @Override
     public ArrayList<String> queue(String printer, TokenObj token) {
+        if (checkToken(token))
+            System.out.println(">>Server<< Queue here");
         return null;
     }
 
     @Override
-    public Void topQueue(String printer, int job, TokenObj token) {
-        return null;
+    public void topQueue(String printer, int job, TokenObj token) {
+        if (checkToken(token))
+            System.out.println(">>Server<< Queue have being moved to top");
     }
 
     @Override
@@ -48,22 +51,28 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
 
     @Override
     public void restart(TokenObj token) {
-
+        if (checkToken(token))
+            System.out.println(">>Server<< Printer restarting");
     }
 
     @Override
     public String status(String printer, TokenObj token) {
-        return null;
+        if (checkToken(token))
+            System.out.println(">>Server<< Status");
+        return "status";
     }
 
     @Override
     public String readConfig(String parameter, TokenObj token) {
-        return null;
+        if (checkToken(token))
+            System.out.println(">>Server<< Config");
+        return "Config";
     }
 
     @Override
     public void setConfig(String parameter, String value, TokenObj token) {
-
+        if (checkToken(token))
+            System.out.println(">>Server<< Setting Config");
     }
 
     @Override
@@ -71,9 +80,10 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         System.out.println(">>Server<< User ID: "+user+" ,Password: "+password);
         Token token = new Token();
         TokenObj tokenobj = new TokenObj(user,token.createUUID(user));
-        System.out.println(">>Server<< Token array length: "+tokens.size());
         if (checkPassword(user, password)) {
             tokens.add(tokenobj);
+            System.out.println(">>Server<< "+user+" have be logged in using password: "+password);
+            System.out.println(">>Server<< Distributing Token, Token array length: "+tokens.size());
             return tokenobj;
         }
         else{
