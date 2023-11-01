@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Objects;
 
 public class Server extends UnicastRemoteObject implements RemoteInterface {
     String pwDB = "pwDB";
@@ -77,20 +78,46 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
 
     @Override
     public TokenObj auth(String user, String password) throws RemoteException, SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
-        System.out.println(">>Server<< User ID: "+user+" ,Password: "+password);
+
+        System.out.println(">>Server<< User ID: " + user + " ,Password: " + password);
         Token token = new Token();
-        TokenObj tokenobj = new TokenObj(user,token.createUUID(user));
-        if (checkPassword(user, password)) {
-            tokens.add(tokenobj);
-            System.out.println(">>Server<< "+user+" have be logged in using password: "+password);
-            System.out.println(">>Server<< Distributing Token, Token array length: "+tokens.size());
-            return tokenobj;
+        boolean duplicate_flag = checkDuplicate(user);
+        TokenObj tokenobj = new TokenObj(user, token.createUUID(user));
+        if (duplicate_flag) {
+            if (checkPassword(user, password)) {
+                tokens.add(tokenobj);
+                System.out.println(">>Server<< User Authentication duplicated, Distributing new token for user: " + user);
+                System.out.println(">>Server<< Distributing Token, "+ " Token: "+tokenobj.uuid+" Token array length: " + tokens.size());
+                return tokenobj;
+            } else {
+                System.out.println(">>Server<< Authentication failed");
+                return null;
+            }
         }
-        else{
-            System.out.println(">>Server<< Authentication failed");
-            return null;
+        else {
+            if (checkPassword(user, password)) {
+                tokens.add(tokenobj);
+                System.out.println(">>Server<< " + user + " have be logged in using password: " + password);
+                System.out.println(">>Server<< Distributing Token, "+ " Token: "+tokenobj.uuid+" Token array length: " + tokens.size());
+                return tokenobj;
+            } else {
+                System.out.println(">>Server<< Authentication failed");
+                return null;
+            }
         }
     }
+
+    private boolean checkDuplicate(String user) {
+        for (TokenObj t : tokens) {
+            // System.out.println(">>122<< "+t.id+" "+user+" "+Objects.equals(t.id, user));
+            if(Objects.equals(t.id, user))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean checkPassword(String user, String plainPsw) throws SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
         DatabaseHelper passwordDbHelper;
         DatabaseHelper condimentsDbHelper;
