@@ -109,9 +109,9 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
 
     private boolean checkDuplicate(String user) {
         for (TokenObj t : tokens) {
-            // System.out.println(">>122<< "+t.id+" "+user+" "+Objects.equals(t.id, user));
             if(Objects.equals(t.id, user))
             {
+                tokens.remove(t);
                 return true;
             }
         }
