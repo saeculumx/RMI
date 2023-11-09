@@ -11,7 +11,7 @@ public class DatabaseHelper {
         String query = null;
         //Create table in database
         if (dbName.equals("pwDB")){
-            query = "CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, email TEXT NOT NULL, password_hash TEXT NOT NULL);";
+            query = "CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, email TEXT NOT NULL, password_hash TEXT NOT NULL UNIQUE);";
         }
         else if (dbName.equals("condimentsDB")){
             query = "CREATE TABLE IF NOT EXISTS condiments ( id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, salt TEXT NOT NULL);";
