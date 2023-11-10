@@ -17,14 +17,14 @@ public class Client{
         System.out.println(">>Client<< Server Connected");
         token = server.auth(user, password);
         if (token != null){
-            //System.out.println(">>Client<< " + "Token is: "+token.id+" - "+token.uuid);
+            System.out.println(">>Client<< " + "Token is: "+token.id+" - "+token.uuid);
         }
         else {
             System.out.println(">>Client<< Wrong password or username");
         }
         //Test printing with authentication
-        System.out.println(">>Server said<< " + "\"" + server.print(">>Client Requesting<< I want to print", "genericPrinter", token)+ "\"");
-        System.out.println(">>Server said<< " + "\"" + server.readConfig(">>Client Requesting<< I managed to print!", token)+ "\"");
+        System.out.println(">>Server Reply<< " + "\"" + server.print("Print Successful", "genericPrinter", token)+ "\"");
+        System.out.println(">>Server Reply<< " + "\"" + server.readConfig(">>Read", token)+ "\"");
     }
 
     public boolean is_auth(){

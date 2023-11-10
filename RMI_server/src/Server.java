@@ -16,28 +16,55 @@ import java.util.Objects;
 public class Server extends UnicastRemoteObject implements RemoteInterface {
     String pwDB = "pwDB";
     String condimentsDB = "condimentsDB";
+    String user;
     ArrayList<TokenObj> tokens = new ArrayList<>();
     public Server() throws RemoteException, ServerNotActiveException {
         super();
     }
     @Override
-    public String print(String filename, String printer, TokenObj token) {
+    public String print(String filename, String printer, TokenObj token) throws SQLException {
+        DatabaseHelper passwordDbHelper;
+        passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+        String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
         if (checkToken(token))
-            System.out.println(filename);
-        return filename;
+            if (checkFuncAvailability(passwordHash)){
+                System.out.println(filename);
+                return filename;
+            }
+            else {System.out.println(">>Server<< Access Denied");
+            return "Access Denied";
+            }
+        return "Access Denied";
     }
 
     @Override
-    public ArrayList<String> queue(String printer, TokenObj token) {
+    public ArrayList<String> queue(String printer, TokenObj token) throws SQLException {
+        DatabaseHelper passwordDbHelper;
+        passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+        String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
         if (checkToken(token))
-            System.out.println(">>Server<< Queue here");
+            if (checkFuncAvailability(passwordHash)){
+                System.out.println(">>Server<< Queue here");
+                return new ArrayList<String>();
+            }
+            else {System.out.println(">>Server<< Access Denied");
+                return null;
+            }
         return null;
     }
 
     @Override
-    public void topQueue(String printer, int job, TokenObj token) {
+    public void topQueue(String printer, int job, TokenObj token) throws SQLException {
+        DatabaseHelper passwordDbHelper;
+        passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+        String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
         if (checkToken(token))
-            System.out.println(">>Server<< Queue have being moved to top");
+            if (checkFuncAvailability(passwordHash)){
+                System.out.println(">>Server<< Queue have being moved to top");
+            }
+            else {
+                System.out.println(">>Server<< Access Denied");
+            }
     }
 
     @Override
@@ -51,34 +78,65 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
     }
 
     @Override
-    public void restart(TokenObj token) {
+    public void restart(TokenObj token) throws SQLException {
+        DatabaseHelper passwordDbHelper;
+        passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+        String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
         if (checkToken(token))
-            System.out.println(">>Server<< Printer restarting");
+            if (checkFuncAvailability(passwordHash)) {
+                System.out.println(">>Server<< Printer restarting");
+            }
+            else {
+                System.out.println(">>Server<< Access Denied");
+            }
     }
 
     @Override
-    public String status(String printer, TokenObj token) {
-        if (checkToken(token))
-            System.out.println(">>Server<< Status");
-        return "status";
+    public String status(String printer, TokenObj token) throws SQLException {
+            DatabaseHelper passwordDbHelper;
+            passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+            String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
+            if (checkToken(token))
+                if (checkFuncAvailability(passwordHash)){
+                    return "status";
+                }
+                else {System.out.println(">>Server<< Access Denied");
+                    return "Access Denied";
+                }
+            return "Access Denied";
     }
 
     @Override
-    public String readConfig(String parameter, TokenObj token) {
+    public String readConfig(String parameter, TokenObj token) throws SQLException {
+        DatabaseHelper passwordDbHelper;
+        passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+        String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
         if (checkToken(token))
-            System.out.println(">>Server<< Config");
+            if (checkFuncAvailability(passwordHash)) {
+                System.out.println(">>Server<< Config");
+            }
+            else {System.out.println(">>Server<< Access Denied");
+                return "Access Denied";
+            }
         return "Config";
     }
 
     @Override
-    public void setConfig(String parameter, String value, TokenObj token) {
+    public void setConfig(String parameter, String value, TokenObj token) throws SQLException {
+        DatabaseHelper passwordDbHelper;
+        passwordDbHelper = DatabaseHelper.getInstance("pwDB");
+        String passwordHash = passwordDbHelper.getPasswordHashByUser(user);
         if (checkToken(token))
-            System.out.println(">>Server<< Setting Config");
+            if (checkFuncAvailability(passwordHash)){
+                System.out.println("Config set");
+            }
+            else {System.out.println(">>Server<< Access Denied");
+            }
     }
 
     @Override
     public TokenObj auth(String user, String password) throws RemoteException, SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
-
+        this.user = user;
         System.out.println(">>Server<< User ID: " + user + " ,Password: " + password);
         Token token = new Token();
         boolean duplicate_flag = checkDuplicate(user);
@@ -118,7 +176,7 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         return false;
     }
 
-    public boolean checkPassword(String user, String plainPsw) throws SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
+    private boolean checkPassword(String user, String plainPsw) throws SQLException, NoSuchAlgorithmException, UnsupportedEncodingException {
         DatabaseHelper passwordDbHelper;
         DatabaseHelper condimentsDbHelper;
         String salt, pwFromDb, hashedPw;
@@ -141,7 +199,7 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         return pwFromDb.equals(hashedPw);
     }
 
-    public boolean checkToken(TokenObj token){
+    private boolean checkToken(TokenObj token){
         //TODO Implement token expiration
         if (token == null) return false;
         for (TokenObj tok:tokens
@@ -151,7 +209,7 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         return false;
     }
 
-    public void addUser(String user, String email, String password) throws SQLException, UnsupportedEncodingException, NoSuchAlgorithmException {
+    public void addUser(String user, String email, String password, ArrayList<String> functionList) throws SQLException, UnsupportedEncodingException, NoSuchAlgorithmException {
         DatabaseHelper db;
         db = DatabaseHelper.getInstance("pwDB");
         //Generate new salt and hash password
@@ -163,7 +221,50 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         db = DatabaseHelper.getInstance("condimentsDB");
         db.addUserSalt(user, Base64.getEncoder().encodeToString(newSalt));
         db.close();
+        //Create user function list
+        db = DatabaseHelper.getInstance("ASL");
+        db.addFunction(user,functionList);
+        db.close();
     }
 
+    private ArrayList<String> getFunctionsFromUsername(String user) throws SQLException {
+        ArrayList<String> funcArrayList = new ArrayList<>();
+        DatabaseHelper db;
+        db = DatabaseHelper.getInstance("ASL");
+        funcArrayList = db.getFunctions(user);
+        if (funcArrayList!=null){
+            return funcArrayList;
+        }
+        else {
+            System.out.println(">>Server<< Error, Arraylist return null");
+            return null;
+        }
+    }
+
+    private boolean checkFuncAvailability(String passwordHash) throws SQLException{
+        DatabaseHelper db;
+        db = DatabaseHelper.getInstance("pwDB");
+        String user = db.getUsernameFromToken(passwordHash);
+        String superFunction = getCallerMethodName();
+        System.out.println(">>Server<< Current class: "+this.getClass().getSimpleName()+" Super function: "+superFunction);
+        ArrayList<String> func = getFunctionsFromUsername(user);
+        System.out.println(">>Server<< Function acquired, "+func+" with "+superFunction);
+        for(String f: func){
+            if (f.equals(superFunction)){
+                System.out.println(">>Server<< Function equal");
+                return true;
+            }
+        }
+        System.out.println(">>Server<< Function not equal");
+        return false;
+    }
+
+    private static String getCallerMethodName()
+    {
+        return StackWalker.
+                getInstance().
+                walk(stream -> stream.skip(2).findFirst().get()).
+                getMethodName();
+    }
 }
 
