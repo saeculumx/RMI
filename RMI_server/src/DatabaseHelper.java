@@ -54,7 +54,7 @@ public class DatabaseHelper {
             statement.executeUpdate(query);
             statement.close();
         }
-        if (dbName.equals("ASL")){
+        if (dbName.equals("ASL")) {
             instance.connection = DriverManager.getConnection("jdbc:sqlite:" + dbName);
             String query = "CREATE TABLE IF NOT EXISTS functions  (\n" +
                     "    id INTEGER PRIMARY KEY,\n" +
@@ -120,7 +120,7 @@ public class DatabaseHelper {
         statement.close();
     }
 
-    public void addFunction(String name, ArrayList<String> functionList)throws SQLException{
+    public void addFunction(String name, ArrayList<String> functionList) throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:" + "condimentsDB");
         String id_query = "SELECT id FROM condiments WHERE username = ?";
         PreparedStatement statement = connection.prepareStatement(id_query);
@@ -143,6 +143,15 @@ public class DatabaseHelper {
         statement1.executeUpdate();
     }
 
+    public void setFunctions(String user, ArrayList<String> functionList) throws SQLException {
+        connection = DriverManager.getConnection("jdbc:sqlite:" + "ASL");
+        String query = "UPDATE functions SET functions = ? WHERE name = ?;";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setObject(1, functionList);
+        statement.setString(2, user);
+        statement.executeUpdate();
+    }
+
     public void addUserSalt(String user, String salt) throws SQLException {
         //TODO Check if connected to condiments DB
         String query = "INSERT INTO condiments (username, salt) VALUES (?, ?);";
@@ -154,7 +163,7 @@ public class DatabaseHelper {
         statement.close();
     }
 
-    public ArrayList<String> getFunctions(String user) throws SQLException{
+    public ArrayList<String> getFunctions(String user) throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:" + "ASL");
         String query = "SELECT functions FROM functions WHERE name = ?";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -163,7 +172,7 @@ public class DatabaseHelper {
         ResultSet results = statement.executeQuery();
         if (results.next()) {
             String s = (String) results.getObject("functions");
-            System.out.println(">>Server<< Client function available: "+s);
+            System.out.println(">>Server<< Client function available: " + s);
             String[] items = s.substring(1, s.length() - 1).split(", ");
             arr = new ArrayList<>(Arrays.asList(items));
             statement.close();
@@ -174,7 +183,7 @@ public class DatabaseHelper {
         }
     }
 
-    public String getUsernameFromToken(String passwordHash) throws SQLException{
+    public String getUsernameFromToken(String passwordHash) throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:" + "pwDB");
         String query = "SELECT username FROM users WHERE password_hash = ?";
         PreparedStatement statement = connection.prepareStatement(query);

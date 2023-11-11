@@ -29,9 +29,10 @@ public class Main {
             String user1 = "userASL_OnlyNormal", email1 = "test@test.test", password1 = "password";
             // server.addUser(user, email, password,allFunctions);
             // server.addUser(user1, email1, password1,normalFunctions);
+            server.setFunctionForUser(user1,normalFunctions);
             registry.rebind("RMIServer", server);
         } catch (Exception e) {
-            System.out.println(">>ERR:<< "+e+" At: "+e.getStackTrace()[0].getLineNumber()+" Cause "+e.getCause());
+            System.out.println(">>ERR:<< " + e + " At: " + e.getStackTrace()[0].getLineNumber() + " Cause " + e.getCause());
         }
 
     }

@@ -241,6 +241,11 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         }
     }
 
+    public void setFunctionForUser(String user, ArrayList<String> functions) throws SQLException{
+        DatabaseHelper db = DatabaseHelper.getInstance("ASL");
+        db.setFunctions(user, functions);
+        System.out.println(">>Server<< Functions: "+functions+" set for user: "+user);
+    }
     private boolean checkFuncAvailability(String passwordHash) throws SQLException{
         DatabaseHelper db;
         db = DatabaseHelper.getInstance("pwDB");
