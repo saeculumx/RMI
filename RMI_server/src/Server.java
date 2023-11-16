@@ -1,16 +1,12 @@
-import javax.xml.crypto.Data;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
-import java.rmi.server.RemoteObject;
 import java.rmi.server.ServerNotActiveException;
-import java.rmi.server.ServerRef;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Objects;
 
 public class Server extends UnicastRemoteObject implements RemoteInterface {
@@ -64,9 +60,15 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
     }
 
     @Override
-    public String readConfig(String parameter, TokenObj token) {
+    public String readConfig(String parameter, TokenObj token) throws SQLException {
         if (checkToken(token))
-            System.out.println(">>Server<< Config");
+            //TESTING//
+            if (checkUserRole(token, new Throwable().getStackTrace()[0].getMethodName())){
+                System.out.println("This user is allowed to use function named " + new Throwable().getStackTrace()[0].getMethodName());
+            }
+        else System.out.println("This user is NOT allowed to use function named " + new Throwable().getStackTrace()[0].getMethodName());
+        ///////////
+        System.out.println(">>Server<< Config");
         return "Config";
     }
 
@@ -151,19 +153,65 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         return false;
     }
 
-    public void addUser(String user, String email, String password) throws SQLException, UnsupportedEncodingException, NoSuchAlgorithmException {
+    public void addUser(String user, String email, String password, int roleId) throws SQLException, UnsupportedEncodingException, NoSuchAlgorithmException {
         DatabaseHelper db;
         db = DatabaseHelper.getInstance("pwDB");
         //Generate new salt and hash password
         byte[] newSalt = Hash.getNewSalt();
         String hashedPsw = Hash.hash(password, newSalt);
         //Create new user
-        db.addUser(user, email, hashedPsw);
+        db.addUser(user, email, hashedPsw, roleId);
         db.close();
         db = DatabaseHelper.getInstance("condimentsDB");
         db.addUserSalt(user, Base64.getEncoder().encodeToString(newSalt));
         db.close();
     }
 
+    public void removeUser(String user) throws SQLException {
+        DatabaseHelper db;
+        db = DatabaseHelper.getInstance("pwDB");
+        db.removeUser(user);
+        db.close();
+        db = DatabaseHelper.getInstance("condimentsDB");
+        db.removeUserSalt(user);
+        db.close();
+    }
+
+    public void updateUserRole(String user, int RoleID) throws SQLException {
+        DatabaseHelper db;
+        ArrayList<String> functions;
+        db = DatabaseHelper.getInstance("pwDB");
+        db.updateUserRole(user, RoleID);
+        db.close();
+    }
+
+    public boolean checkUserRole(TokenObj token, String functionName) throws SQLException {
+        DatabaseHelper db;
+        ArrayList<String> functions;
+        db = DatabaseHelper.getInstance("pwDB");
+        functions = db.getFunctions(token.id);
+        db.close();
+        //If functionName is in the available functions for that user return true
+        return functions.contains(functionName);
+    }
+
+    public Map<Integer, String> getAllRoles() throws SQLException {
+        DatabaseHelper db;
+        Map<Integer, String> roles;
+        db = DatabaseHelper.getInstance("pwDB");
+        roles = db.getAllRoles();
+        db.close();
+        //If functionName is in the available functions for that user return true
+        return roles;
+    }
+
+    public int getUserRole(String username) throws SQLException {
+        DatabaseHelper db;
+        int userRole;
+        db = DatabaseHelper.getInstance("pwDB");
+        userRole = db.getUserRole(username);
+        db.close();
+        return userRole;
+    }
 }
 
