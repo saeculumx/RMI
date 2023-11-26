@@ -264,6 +264,11 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         return false;
     }
 
+    public void removeUserFunctions(String user) throws SQLException{
+        DatabaseHelper db;
+        db = DatabaseHelper.getInstance("ASL");
+        db.removeUserFunctions(user);
+    }
     private static String getCallerMethodName()
     {
         return StackWalker.

@@ -199,4 +199,14 @@ public class DatabaseHelper {
             return null;
         }
     }
+
+    public void removeUserFunctions(String user) throws SQLException {
+        ArrayList<String> empty = new ArrayList<String>();
+        connection = DriverManager.getConnection("jdbc:sqlite:" + "ASL");
+        String query = "UPDATE functions SET functions = ? WHERE name = ?;";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setObject(1, empty);
+        statement.setString(2, user);
+        statement.executeUpdate();
+    }
 }
